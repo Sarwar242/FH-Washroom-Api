@@ -23,8 +23,8 @@ jobs:
           password: ${{ secrets.ftp_password }}
           server-dir: /fh-washroom-api.sarwar.com.bd/
 
-      - name: 📝 Run additional commands
-        run: |
-          # Add your commands here
-          echo "Running additional commands after deployment"
-          php artisan optimize:clear
+      # - name: 📝 Run additional commands
+        # run: |
+        #   # Add your commands here
+        #   echo "Running additional commands after deployment"
+        #   php artisan optimize:clear
