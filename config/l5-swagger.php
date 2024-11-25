@@ -76,7 +76,8 @@ return [
             /*
              * Absolute path to location where parsed swagger annotations will be stored
              */
-            'docs' => storage_path('api-docs'),
+            'docs' => public_path('docs'),
+            // 'docs' => storage_path('api-docs'),
 
             /*
              * File name of the generated json documentation file

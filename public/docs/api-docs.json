@@ -3,9 +3,6 @@
     "info": {
         "title": "Toilet Finder API",
         "description": "Office Toilet Finder API documentation",
-        "contact": {
-            "email": "admin@example.com"
-        },
         "version": "1.0.0"
     },
     "servers": [
@@ -20,7 +17,7 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Login with employee credentials",
+                "summary": "Login user",
                 "operationId": "2dd578ff7aba2721293dac66833b27d1",
                 "requestBody": {
                     "required": true,
@@ -48,28 +45,24 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Login successful",
+                        "description": "Successful login",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "token": {
-                                            "type": "string",
-                                            "example": "1|laravel_sanctum_token..."
+                                            "type": "string"
                                         },
                                         "user": {
                                             "properties": {
                                                 "id": {
-                                                    "type": "integer",
-                                                    "example": 1
+                                                    "type": "integer"
                                                 },
                                                 "name": {
-                                                    "type": "string",
-                                                    "example": "John Doe"
+                                                    "type": "string"
                                                 },
                                                 "employee_id": {
-                                                    "type": "string",
-                                                    "example": "EMP123"
+                                                    "type": "string"
                                                 }
                                             },
                                             "type": "object"
@@ -79,11 +72,27 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation error"
                     }
                 }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout user",
+                "operationId": "68a6108af04af5e3bc1ea68a6c6f1299",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/maintenance/report": {

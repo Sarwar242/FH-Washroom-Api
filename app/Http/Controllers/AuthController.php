@@ -12,10 +12,10 @@ use Illuminate\Http\Request;
  */
 class AuthController extends Controller
 {
-      /**
+     /**
      * @OA\Post(
      *     path="/login",
-     *     summary="Login with employee credentials",
+     *     summary="Login user",
      *     tags={"Authentication"},
      *     @OA\RequestBody(
      *         required=true,
@@ -27,25 +27,21 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Login successful",
+     *         description="Successful login",
      *         @OA\JsonContent(
-     *             @OA\Property(property="token", type="string", example="1|laravel_sanctum_token..."),
+     *             @OA\Property(property="token", type="string"),
      *             @OA\Property(
      *                 property="user",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="John Doe"),
-     *                 @OA\Property(property="employee_id", type="string", example="EMP123")
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="employee_id", type="string")
      *             )
      *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error"
      *     )
      * )
      */
-    
+
     public function login(Request $request)
     {
         $request->validate([
@@ -71,6 +67,18 @@ class AuthController extends Controller
         ]);
     }
 
+        /**
+     * @OA\Post(
+     *     path="/logout",
+     *     summary="Logout user",
+     *     tags={"Authentication"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully logged out"
+     *     )
+     * )
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
