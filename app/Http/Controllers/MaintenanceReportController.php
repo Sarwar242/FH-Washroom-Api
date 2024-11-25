@@ -4,17 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MaintenanceReportRequest;
 use App\Models\MaintenanceReport;
-use Illuminate\Http\Request;
+use App\Models\Toilet;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @OA\Tag(
+ *     name="Maintenance",
+ *     description="API Endpoints for maintenance management"
+ * )
+ */
 class MaintenanceReportController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/maintenance/report",
+     *     path="/maintenance/report",
      *     summary="Submit a maintenance report",
      *     tags={"Maintenance"},
-     *     security={{ "bearerAuth": {} }},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -28,19 +34,7 @@ class MaintenanceReportController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Report submitted successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string"),
-     *             @OA\Property(
-     *                 property="report",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="toilet_id", type="integer"),
-     *                 @OA\Property(property="issue_type", type="string"),
-     *                 @OA\Property(property="priority", type="string"),
-     *                 @OA\Property(property="status", type="string"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time")
-     *             )
-     *         )
+     *         @OA\JsonContent(ref="#/components/schemas/MaintenanceReport")
      *     )
      * )
      */
@@ -54,7 +48,6 @@ class MaintenanceReportController extends Controller
             'priority' => $request->priority
         ]);
 
-        // Mark toilet as non-operational for urgent issues
         if ($request->priority === 'urgent') {
             $report->toilet->update(['is_operational' => false]);
         }
@@ -65,6 +58,22 @@ class MaintenanceReportController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/maintenance/reports",
+     *     summary="Get all active maintenance reports",
+     *     tags={"Maintenance"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of maintenance reports",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/MaintenanceReport")
+     *         )
+     *     )
+     * )
+     */
     public function getReports()
     {
         $reports = MaintenanceReport::with(['toilet.washroom'])
@@ -74,5 +83,36 @@ class MaintenanceReportController extends Controller
             ->get();
 
         return response()->json($reports);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/maintenance/history/{toilet}",
+     *     summary="Get maintenance history for a specific toilet",
+     *     tags={"Maintenance"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="toilet",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Maintenance history",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/MaintenanceReport")
+     *         )
+     *     )
+     * )
+     */
+    public function getToiletHistory(Toilet $toilet)
+    {
+        $history = MaintenanceReport::where('toilet_id', $toilet->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($history);
     }
 }
