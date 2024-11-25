@@ -27,5 +27,4 @@ jobs:
         run: |
           # Add your commands here
           echo "Running additional commands after deployment"
-          composer dump-autoload
           php artisan optimize:clear
