@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Toilet;
 use App\Models\ToiletUsageLog;
+use App\Models\ToiletWaitingList;
+use App\Notifications\ToiletNotification;
+use App\Services\FirebaseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -15,8 +18,16 @@ use Illuminate\Http\Request;
  */
 class ToiletController extends Controller
 {
-    private const OCCUPATION_DURATION = 15; // minutes
+    private const OCCUPATION_DURATION = 10; // minutes
+    private const WAITING_NOTIFICATION_WINDOW = 2; // minutes
+    private const REMINDER_BEFORE_EXPIRY = 1; // minutes
 
+    private $firebaseService;
+
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
     /**
      * @OA\Post(
      *     path="/toilets/{toilet}/occupy",
@@ -97,6 +108,31 @@ class ToiletController extends Controller
 
         $toilet->release();
 
+         // Notify waiting users
+         $waitingUsers = ToiletWaitingList::where('toilet_id', $toilet->id)
+         ->whereNull('notified_at')
+         ->orderBy('joined_at')
+         ->get();
+
+        foreach ($waitingUsers as $waitingUser) {
+            $waitingUser->update([
+                'notified_at' => now(),
+                'expires_at' => now()->addMinutes(self::WAITING_NOTIFICATION_WINDOW)
+            ]);
+
+            $waitingUser->user->notify(new ToiletNotification(
+                "Toilet {$toilet->number} is now available. You have {self::WAITING_NOTIFICATION_WINDOW} minutes to occupy it.",
+                'availability',
+                $toilet->id
+            ));
+
+            $this->firebaseService->sendToiletAvailableNotification(
+                $waitingUser->user_id,
+                $toilet->number,
+                $toilet->id
+            );
+        }
+
         return response()->json(['message' => 'Toilet released successfully']);
     }
 
@@ -138,5 +174,48 @@ class ToiletController extends Controller
             'message' => 'Occupation time extended successfully',
             'expires_at' => $toilet->occupation_expires_at
         ]);
+    }
+
+     /**
+     * @OA\Post(
+     *     path="/toilets/{toilet}/join-waitlist",
+     *     summary="Join toilet waiting list",
+     *     tags={"Toilets"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Added to waiting list"
+     *     )
+     * )
+     */
+    public function joinWaitingList(Request $request, Toilet $toilet)
+    {
+        $existingEntry = ToiletWaitingList::where('toilet_id', $toilet->id)
+            ->where('user_id', $request->user()->id)
+            ->whereNull('notified_at')
+            ->first();
+
+        if ($existingEntry) {
+            return response()->json(['message' => 'Already in waiting list']);
+        }
+
+        ToiletWaitingList::create([
+            'toilet_id' => $toilet->id,
+            'user_id' => $request->user()->id,
+            'joined_at' => now(),
+            'expires_at' => now()->addHours(1)
+        ]);
+
+        return response()->json(['message' => 'Added to waiting list']);
+    }
+
+    protected function scheduleExpiryNotification($toilet)
+    {
+        $notificationTime = $toilet->occupation_expires_at->subMinutes(self::REMINDER_BEFORE_EXPIRY);
+
+        $toilet->occupant->notify((new ToiletNotification(
+            "Your occupation of toilet {$toilet->number} will expire in {self::REMINDER_BEFORE_EXPIRY} minute.",
+            'expiry_warning',
+            $toilet->id
+        ))->delay($notificationTime));
     }
 }

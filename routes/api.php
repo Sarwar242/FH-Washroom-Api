@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WashroomController;
 use App\Http\Controllers\ToiletController;
 use App\Http\Controllers\MaintenanceReportController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -27,4 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/maintenance/report', [MaintenanceReportController::class, 'report']);
     Route::get('/maintenance/reports', [MaintenanceReportController::class, 'getReports']);
     Route::get('/maintenance/history/{toilet}', [MaintenanceReportController::class, 'getToiletHistory']);
+
+    //waiting list
+    Route::post('/toilets/{toilet}/join-waitlist', [ToiletController::class, 'joinWaitingList']);
+
+    //Notification
+    Route::middleware('auth:sanctum')->post('/notifications/register-token', [NotificationController::class, 'registerToken']);
 });
