@@ -9,6 +9,7 @@ use App\Notifications\ToiletNotification;
 use App\Services\FirebaseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -131,6 +132,8 @@ class ToiletController extends Controller
                 $toilet->number,
                 $toilet->id
             );
+
+            Log::info("Notification Sent!");
         }
 
         return response()->json(['message' => 'Toilet released successfully']);

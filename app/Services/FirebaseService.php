@@ -15,7 +15,7 @@ class FirebaseService
     public function __construct()
     {
         // Load service account key
-        $serviceAccountPath = storage_path('firebase-credentials.json');
+        $serviceAccountPath = storage_path('fh-washroom-firebase-firebase-adminsdk-cyqbo-f2438bf233.json');
         $serviceAccount = json_decode(file_get_contents($serviceAccountPath), true);
 
         $this->projectId = $serviceAccount['project_id'];
@@ -27,7 +27,7 @@ class FirebaseService
         );
 
         $this->client = new \GuzzleHttp\Client([
-            'base_uri' => 'https://fcm.googleapis.com/v1/projects/' . $this->projectId,
+            'base_uri' => 'https://fcm.googleapis.com/v1/projects/'. $this->projectId,
             'headers' => [
                 'Authorization' => 'Bearer ' . $credentials->fetchAuthToken()['access_token'],
                 'Content-Type' => 'application/json',
