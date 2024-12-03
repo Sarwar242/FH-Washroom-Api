@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Toilet;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ReleaseExpiredToilets extends Command
 {
@@ -26,6 +27,7 @@ class ReleaseExpiredToilets extends Command
      */
     public function handle(): void
     {
+        Log::notice("Releasing");
         $expiredCount = Toilet::where('is_occupied', true)
             ->where('occupation_expires_at', '<', now())
             ->get()
