@@ -60,7 +60,7 @@ class FirebaseService
             $response = $this->client->post("projects/{$this->projectId}/messages:send", [
                 'json' => $message
             ]);
-
+            Log::info("res: ", json_decode($response->getBody()->getContents(), true));
             return json_decode($response->getBody()->getContents(), true);
         } catch (\Exception $e) {
             Log::error('Firebase notification failed: ' . $e->getMessage());
