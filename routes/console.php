@@ -9,4 +9,4 @@ Artisan::command('inspire', function () {
 
 Artisan::command('toilets:release-expired', function () {
     $this->info("toilets release!");
-});
+})->everyMinute()->sendOutputTo(storage_path('schedule-log.txt'));
