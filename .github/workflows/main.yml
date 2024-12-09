@@ -28,7 +28,7 @@ jobs:
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
           server-dir: /fh-washroom-api.sarwar.com.bd/
-          exclude: '*.zip, *.rar, /node_modules/, /vendor/'
+          exclude: '*.zip, *.rar, /node_modules/'
           
       - name: 📝 Run additional commands
         run: |
