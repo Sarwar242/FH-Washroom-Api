@@ -30,8 +30,8 @@ jobs:
           server-dir: /fh-washroom-api.sarwar.com.bd/
           exclude: '*.zip, *.rar, /node_modules/'
           
-      - name: 📝 Run additional commands
-        run: |
-          php artisan migrate --force # Run database migrations
-          composer dump-autoload # Regenerate autoloader
-          php artisan optimize:clear # Clear cache
+      # - name: 📝 Run additional commands
+      #   run: |
+      #     php artisan migrate --force # Run database migrations
+      #     composer dump-autoload # Regenerate autoloader
+      #     php artisan optimize:clear # Clear cache
