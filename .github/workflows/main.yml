@@ -28,9 +28,10 @@ jobs:
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
           server-dir: /fh-washroom-api.sarwar.com.bd/
+          timeout: 600
 
       - name: 📝 Run additional commands
         run: |
-          php artisan migrate --force # Run database migrations
+          php artisan migrate:fresh --seed # Run database migrations
           composer dump-autoload # Regenerate autoloader
           php artisan optimize:clear # Clear cache
