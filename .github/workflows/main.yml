@@ -12,8 +12,14 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v2.3.2
 
-      # - name: Install Composer Dependencies
-      #   run: composer install --prefer-dist --no-progress --no-suggest
+      - name: 🔧 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Replace with your desired PHP version
+          tools: composer:v2
+
+      - name: 📦 Install Composer Dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
@@ -23,9 +29,8 @@ jobs:
           password: ${{ secrets.ftp_password }}
           server-dir: /fh-washroom-api.sarwar.com.bd/
 
-      # - name: 📝 Run additional commands
-      #   run: |
-      #     # Add your commands here
-      #     echo "Running additional commands after deployment"
-      #     composer dump-autoload
-      #     php artisan optimize:clear
+      - name: 📝 Run additional commands
+        run: |
+          php artisan migrate --force # Run database migrations
+          composer dump-autoload # Regenerate autoloader
+          php artisan optimize:clear # Clear cache
