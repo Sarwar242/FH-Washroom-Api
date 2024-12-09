@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v2.3.2
+        uses: actions/checkout@v4
 
       - name: 🔧 Setup PHP
         uses: shivammathur/setup-php@v2
@@ -18,11 +18,11 @@ jobs:
           php-version: '8.2' # Replace with your desired PHP version
           tools: composer:v2
 
-      # - name: 📦 Install Composer Dependencies
-      #   run: composer install --prefer-dist --no-progress --no-suggest
+      - name: 📦 Install Composer Dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftp.mbbagro.com
           username: ${{ secrets.ftp_username }}
@@ -30,8 +30,8 @@ jobs:
           server-dir: /fh-washroom-api.sarwar.com.bd/
           exclude: '*.zip, *.rar, /node_modules/'
           
-      # - name: 📝 Run additional commands
-      #   run: |
-      #     php artisan migrate --force # Run database migrations
-      #     composer dump-autoload # Regenerate autoloader
-      #     php artisan optimize:clear # Clear cache
+      - name: 📝 Run additional commands
+        run: |
+          php artisan migrate --force # Run database migrations
+          composer dump-autoload # Regenerate autoloader
+          php artisan optimize:clear # Clear cache
