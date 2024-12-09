@@ -22,13 +22,18 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
           server: ftp.mbbagro.com
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
           server-dir: /fh-washroom-api.sarwar.com.bd/
-          exclude: '*.zip, *.rar, /node_modules/'
+          exclude: |
+            *.zip
+            *.rar 
+            /node_modules/
+            **/.git*
+            **/.git*/**
           
       - name: 📝 Run additional commands
         run: |
