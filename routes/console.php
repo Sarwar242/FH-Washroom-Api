@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Artisan::command('toilets:release-expired', function () {
-    $this->info("toilets release!");
-})->everyMinute()->sendOutputTo(storage_path('schedule-log.txt'));
+    $this->info(now()." : toilets release!");
+})->everyMinute()->appendOutputTo(storage_path('schedule-log.txt'));
